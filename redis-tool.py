@@ -12,6 +12,12 @@ max_time_complexity=10
 output_file_name = ""
 output_file = None
 
+supported_commands=["export-keys"]
+command=supported_commands[0]
+supported_commands_str = ""
+for supported_command in supported_commands:
+    supported_commands_str += supported_command + " "
+
 output_type_screen = 0  #Out put the status to the screen.
 output_type_file = 1  #Out put the status to the files.
 output_type = output_type_screen #default output is the screen.
@@ -220,9 +226,12 @@ def usage():
     print '-p: target user password'
     print '-o: output the status to this file'
     print '-e: output error message to this file'
-    print '-i: time interval to show the status, unit is second'
+    print '-i: interval'
+    print '-C: the command to be executed, default is \'' + supported_commands[0] + "\'"
     print '--socket: the socket file to use for connection'
     print '\r\n'
+    print 'Supported commands: ' + supported_commands_str
+    print ''
 
 def version():
     return '0.1.0'
@@ -233,7 +242,7 @@ def print_version():
 
 if __name__ == "__main__":
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 'hvH:P:p:o:e:i:', ['help', 'version', 'socket='])
+        opts, args = getopt.getopt(sys.argv[1:], 'hvH:P:p:o:e:i:C:', ['help', 'version', 'socket='])
     except getopt.GetoptError, err:
         print str(err)
         usage()
@@ -259,6 +268,17 @@ if __name__ == "__main__":
             errlog_file_name = arg
         elif opt in ('-i'):
             interval = int(arg)
+        elif opt in ('-C'):
+            command = arg
+            find = 0
+            for supported_command in supported_commands:
+                if supported_command == command:
+                    find = 1
+
+            if find == 0:
+                print 'ERROR! Not suppoted command: ' + command
+                print 'Supported commands: ' + supported_commands_str
+                sys.exit(3)
         elif opt in ('--socket'):
             socket_file = arg
         else:
